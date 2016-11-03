@@ -1,10 +1,11 @@
 #include <Adafruit_NeoPixel.h>
 
-#define PIN 6   // degital I/O pin
+#define led_pin 6   // led degital I/O pin
 #define NUMPIXELS 1   // 制御するledの数
 
-Adafruit_NeoPixel rgbled = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel rgbled = Adafruit_NeoPixel(NUMPIXELS, led_pin, NEO_GRB + NEO_KHZ800);
 
+int flash_pin = 7;   // flash degital I/O pin
 int low_acceleration = 10;
 int high_acceleration = 1000;
 
@@ -14,6 +15,8 @@ void setup(){
   rgbled.setBrightness(50);   // 明るさ指定(0~255)
   rgbled.setPixelColor(0, rgbled.Color(255, 255, 255));
   rgbled.show();   // 反映
+  pinMode(flash_pin, OUTPUT);
+  digitalWrite(flash_pin, LOW);
 }
 
 void loop(){
@@ -22,8 +25,9 @@ void loop(){
   x = analogRead(0);
   y = analogRead(1);
   z = analogRead(2);
-  int small_error = 125;   // 誤差範囲の一番小さい値
-  int large_error = 225;
+  int small_error = 100;   // 誤差範囲の一番小さい値(Flash用の誤差の値)
+  int medium_error = 125;
+  int large_error = 250;
 
   // フリスビー投げられた時の処理
   if(x<low_acceleration || high_acceleration<x || y<low_acceleration || high_acceleration<y){
@@ -41,12 +45,17 @@ Serial.println(z);
     }
 
 Serial.println(z_sum);
-    if(z_sum < small_error){
+    if(z_sum < medium_error){
       rgbled.setPixelColor(0, rgbled.Color(0, 0, 255));
       rgbled.show();
+      if(z_sum < small_error){
+        delay(50);
+        digitalWrite(flash_pin, HIGH);
+        digitalWrite(flash_pin, LOW);
+      }
       return_loop();
     }
-    if(small_error < z_sum && z_sum < large_error){
+    if(medium_error < z_sum && z_sum < large_error){
       rgbled.setPixelColor(0, rgbled.Color(255, 255, 0));
       rgbled.show();
       return_loop();
