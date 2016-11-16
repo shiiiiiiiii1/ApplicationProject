@@ -7,12 +7,15 @@ const int flash_pin = 7;   // flash degital I/O pin
 Adafruit_NeoPixel rgbled = Adafruit_NeoPixel(num_leds, led_pin, NEO_GRB + NEO_KHZ800);
 
 int x, y, z;
-int small_error = 100;   // 誤差範囲の一番小さい値(Flash用の誤差の値)
-int medium_error = 125;
-int large_error = 250;
+int total_score = 0;   // すごろく的なやつのスコア
+int score6 = 50;   // score判定
+int score5 = 100;
+int score4 = 150;
+int score3 = 200;
+int score2 = 250;
+int score1 = 300;
 int low_acceleration = 24;   // 急激な加速度の検知
 int high_acceleration = 1000;   // 急激な加速度の検知
-int score = 0;   // すごろく的なやつのスコア
 
 
 void setup(){
@@ -43,24 +46,33 @@ void loop(){
       z_before_val = z;
     }
 
-    if(z_sum < medium_error){
-      score += 3;
+    if(score5 < z_sum && z_sum < score6){
+      total_score += 6;
       change_ledcolor(0, 0, 255);
-      if(z_sum < small_error){   // フラッシュ判定
-        delay(50);
-        digitalWrite(flash_pin, HIGH);
-        delay(50);
-        digitalWrite(flash_pin, LOW);
-      }
       return_loop();
     }
-    if(medium_error < z_sum && z_sum < large_error){
-      score += 2;
+    if(score4 < z_sum && z_sum < score5){
+      total_score += 5;
+      change_ledcolor(0, 255, 255);
+      return_loop();
+    }
+    if(score3 < z_sum && z_sum < score4){
+      total_score += 4;
+      change_ledcolor(0, 255, 0);
+      return_loop();
+    }
+    if(score2 < z_sum && z_sum < score3){
+      total_score += 3;
       change_ledcolor(255, 255, 0);
       return_loop();
     }
-    if(large_error < z_sum){
-      score += 1;
+    if(score1 < z_sum && z_sum < score2){
+      total_score += 2;
+      change_ledcolor(255, 105, 180);
+      return_loop();
+    }
+    if(z_sum < score1){
+      total_score += 1;
       change_ledcolor(255, 0, 0);
       return_loop();
     }
@@ -76,16 +88,22 @@ void change_ledcolor(int r, int g, int b) {
 }
 
 void score_led() {
-  if(score > num_leds){
-    score -= num_leds;
+  total_score = total_score>num_leds ? total_score-num_leds : total_score;
+  if(total_score < num_leds){
+    for(int i=0; i<total_score; i++){
+      rgbled.setPixelColor(i, rgbled.Color(255, 0, 0));
+      rgbled.show();
+    }
+    for(int i=total_score; i<num_leds; i++){
+      rgbled.setPixelColor(i, rgbled.Color(0, 0, 0));
+      rgbled.show();
+    }
   }
-  for(int i=0; i<score; i++){
-    rgbled.setPixelColor(i, rgbled.Color(255, 0, 0));
-    rgbled.show();
-  }
-  for(int i=score; i<num_leds; i++){
-    rgbled.setPixelColor(i, rgbled.Color(0, 0, 0));
-    rgbled.show();
+  if(total_score == num_leds){
+    delay(50);
+    digitalWrite(flash_pin, HIGH);
+    delay(50);
+    digitalWrite(flash_pin, LOW);
   }
 }
 
