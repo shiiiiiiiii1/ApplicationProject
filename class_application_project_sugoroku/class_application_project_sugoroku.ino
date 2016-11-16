@@ -12,6 +12,7 @@ int medium_error = 125;
 int large_error = 250;
 int low_acceleration = 24;   // 急激な加速度の検知
 int high_acceleration = 1000;   // 急激な加速度の検知
+int score = 0;   // すごろく的なやつのスコア
 
 
 void setup(){
@@ -43,6 +44,7 @@ void loop(){
     }
 
     if(z_sum < medium_error){
+      score += 3;
       change_ledcolor(0, 0, 255);
       if(z_sum < small_error){   // フラッシュ判定
         delay(50);
@@ -53,10 +55,12 @@ void loop(){
       return_loop();
     }
     if(medium_error < z_sum && z_sum < large_error){
+      score += 2;
       change_ledcolor(255, 255, 0);
       return_loop();
     }
     if(large_error < z_sum){
+      score += 1;
       change_ledcolor(255, 0, 0);
       return_loop();
     }
@@ -71,12 +75,26 @@ void change_ledcolor(int r, int g, int b) {
   }
 }
 
+void score_led() {
+  if(score > num_leds){
+    score -= num_leds;
+  }
+  for(int i=0; i<score; i++){
+    rgbled.setPixelColor(i, rgbled.Color(255, 0, 0));
+    rgbled.show();
+  }
+  for(int i=score; i<num_leds; i++){
+    rgbled.setPixelColor(i, rgbled.Color(0, 0, 0));
+    rgbled.show();
+  }
+}
+
 void return_loop() {
   while(1){
     delay(50);
     acceleration_read();
     if(x<low_acceleration || high_acceleration<x || y<low_acceleration || high_acceleration<y){
-      change_ledcolor(255, 255, 255);
+      score_led();
       delay(200);
       break;
     }
