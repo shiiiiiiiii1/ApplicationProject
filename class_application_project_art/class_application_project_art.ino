@@ -6,12 +6,9 @@ const int flash_pin = 7;   // flash degital I/O pin
 
 Adafruit_NeoPixel rgbled = Adafruit_NeoPixel(num_leds, led_pin, NEO_GRB + NEO_KHZ800);
 
-int x, y, z;
-int small_error = 100;   // 誤差範囲の一番小さい値(Flash用の誤差の値)
-int medium_error = 125;
-int large_error = 250;
-int low_acceleration = 24;   // 急激な加速度の検知
-int high_acceleration = 1000;   // 急激な加速度の検知
+int x, y, z, R, G, B, acceleration;
+int H = 0;
+int current_H = 0;
 
 
 void setup(){
@@ -21,65 +18,78 @@ void setup(){
     rgbled.setPixelColor(i, rgbled.Color(255, 255, 255));
     rgbled.show();   // 反映
   }
+  Serial.begin(9600);
   pinMode(flash_pin, OUTPUT);
   digitalWrite(flash_pin, LOW);
 }
 
 void loop(){
   acceleration_read();
-
-  // フリスビー投げられた時の処理
-  if(x<low_acceleration || high_acceleration<x || y<low_acceleration || high_acceleration<y){
-    delay(100);
-    int z_before_val = analogRead(2);
-    int z_difference = 0;
-    int z_sum = 0;
-    for(int i=0; i<2; i++){
-      delay(50);
-      z = analogRead(2);
-      z_difference = abs(z_before_val - z);
-      z_sum += z_difference;
-      z_before_val = z;
-    }
-
-    if(z_sum < medium_error){
-      change_ledcolor(0, 0, 255);
-      if(z_sum < small_error){   // フラッシュ判定
-        delay(50);
-        digitalWrite(flash_pin, HIGH);
-        delay(50);
-        digitalWrite(flash_pin, LOW);
-      }
-      return_loop();
-    }
-    if(medium_error < z_sum && z_sum < large_error){
-      change_ledcolor(255, 255, 0);
-      return_loop();
-    }
-    if(large_error < z_sum){
-      change_ledcolor(255, 0, 0);
-      return_loop();
-    }
+  x = map(x, 0, 1023, -511, 512);
+  y = map(y, 0, 1023, -511, 512);
+  z = map(z, 0, 1023, 512, -511);
+  float x2 = pow(x, 2.0);
+  float y2 = pow(y, 2.0);
+  float z2 = pow(z, 2.0);
+  acceleration = sqrt(x2 + y2 + z2);
+  if(acceleration >= 85){
+    acceleration = map(acceleration, 85, 886, 0, 360);
   }
+  if(acceleration < 85){
+    acceleration = map(acceleration, -717, 84, 360, 0);
+  }
+  H += acceleration;
+
+  Serial.println(acceleration);
+
+  // Serial.println(current_H);
+  // Serial.println(H);
+
+  if(H <= 360){
+    if(5 <= acceleration && acceleration <= 20){
+      change_rgb(current_H, current_H);
+      H = current_H;
+    }
+    change_rgb(current_H, H);
+  }
+  current_H = H;
+  if(H > 360){
+    int extra_H = H - 360;
+    H = 360;
+    change_rgb(current_H, H);
+    current_H = 0;
+    change_rgb(current_H, extra_H);
+    current_H = extra_H;
+    H = 0;
+  }
+  delay(50);
 }
 
+
+void change_rgb(int current_H, int H){
+  for(int i=0; current_H<=H; current_H++){
+    if(current_H <= 120) {
+      R = map(current_H, 0, 120, 255, 0);
+      G = map(current_H, 0, 120, 0, 255);
+      B = 0;
+    } else if (current_H <= 240) {
+      G = map(current_H, 120, 240, 255, 0);
+      B = map(current_H, 120, 240, 0, 255);
+      R = 0;
+    } else {
+      B = map(current_H, 240, 360, 255, 0);
+      R = map(current_H, 240, 360, 0, 255);
+      G= 0;
+    }
+    change_ledcolor(R, G, B);
+    delay(3);
+  }
+}
 
 void change_ledcolor(int r, int g, int b) {
   for(int i=0; i<num_leds; i++){
     rgbled.setPixelColor(i, rgbled.Color(r, g, b));
     rgbled.show();
-  }
-}
-
-void return_loop() {
-  while(1){
-    delay(50);
-    acceleration_read();
-    if(x<low_acceleration || high_acceleration<x || y<low_acceleration || high_acceleration<y){
-      change_ledcolor(255, 255, 255);
-      delay(200);
-      break;
-    }
   }
 }
 
