@@ -7,9 +7,14 @@ const int flash_pin = 7;   // flash degital I/O pin
 Adafruit_NeoPixel rgbled = Adafruit_NeoPixel(num_leds, led_pin, NEO_GRB + NEO_KHZ800);
 
 int x, y, z;
-int small_error = 100;   // 誤差範囲の一番小さい値(Flash用の誤差の値)
-int medium_error = 125;
-int large_error = 250;
+int total_score = 0;   // すごろく的なやつのスコア
+int over_score = 30;
+int score1 = 50;   // score判定
+int score2 = 100;
+int score3 = 150;
+int score4 = 200;
+int score5 = 250;
+int score6 = 300;
 int low_acceleration = 24;   // 急激な加速度の検知
 int high_acceleration = 1000;   // 急激な加速度の検知
 
@@ -30,6 +35,7 @@ void loop(){
 
   // フリスビー投げられた時の処理
   if(x<low_acceleration || high_acceleration<x || y<low_acceleration || high_acceleration<y){
+    change_ledcolor(0, 0, 255);
     delay(100);
     int z_before_val = analogRead(2);
     int z_difference = 0;
@@ -42,22 +48,28 @@ void loop(){
       z_before_val = z;
     }
 
-    if(z_sum < medium_error){
-      change_ledcolor(0, 0, 255);
-      if(z_sum < small_error){   // フラッシュ判定
-        delay(50);
-        digitalWrite(flash_pin, HIGH);
-        delay(50);
-        digitalWrite(flash_pin, LOW);
-      }
+    if(score1 < z_sum && z_sum < score2){
+      total_score += 1;
       return_loop();
     }
-    if(medium_error < z_sum && z_sum < large_error){
-      change_ledcolor(255, 255, 0);
+    if(score2 < z_sum && z_sum < score3){
+      total_score += 2;
       return_loop();
     }
-    if(large_error < z_sum){
-      change_ledcolor(255, 0, 0);
+    if(score3 < z_sum && z_sum < score4){
+      total_score += 3;
+      return_loop();
+    }
+    if(score4 < z_sum && z_sum < score5){
+      total_score += 4;
+      return_loop();
+    }
+    if(score5 < z_sum && z_sum < score6){
+      total_score += 5;
+      return_loop();
+    }
+    if(score6 < z_sum){
+      total_score += 6;
       return_loop();
     }
   }
@@ -71,12 +83,27 @@ void change_ledcolor(int r, int g, int b) {
   }
 }
 
+void remaind_decision(int current_score) {
+  if(10 <= current_score && current_score < 20){
+    change_ledcolor(255, 255, 0);
+  }
+  if(20 <= current_score && current_score < 30){
+    change_ledcolor(255, 0, 0);
+  }
+}
+
 void return_loop() {
   while(1){
     delay(50);
     acceleration_read();
     if(x<low_acceleration || high_acceleration<x || y<low_acceleration || high_acceleration<y){
-      change_ledcolor(255, 255, 255);
+      if(total_score >= over_score){
+        delay(50);
+        digitalWrite(flash_pin, HIGH);
+        delay(50);
+        digitalWrite(flash_pin, LOW);
+        total_score = 0;
+      }
       delay(200);
       break;
     }
