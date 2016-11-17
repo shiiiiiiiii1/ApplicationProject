@@ -14,7 +14,6 @@ int score2 = 100;
 int score3 = 150;
 int score4 = 200;
 int score5 = 250;
-int score6 = 300;
 int low_acceleration = 24;   // 急激な加速度の検知
 int high_acceleration = 1000;   // 急激な加速度の検知
 
@@ -48,27 +47,27 @@ void loop(){
       z_before_val = z;
     }
 
-    if(score1 < z_sum && z_sum < score2){
+    if(z_sum < score1){
       total_score += 1;
       return_loop();
     }
-    if(score2 < z_sum && z_sum < score3){
+    if(score1 < z_sum && z_sum < score2){
       total_score += 2;
       return_loop();
     }
-    if(score3 < z_sum && z_sum < score4){
+    if(score2 < z_sum && z_sum < score3){
       total_score += 3;
       return_loop();
     }
-    if(score4 < z_sum && z_sum < score5){
+    if(score3 < z_sum && z_sum < score4){
       total_score += 4;
       return_loop();
     }
-    if(score5 < z_sum && z_sum < score6){
+    if(score4 < z_sum && z_sum < score5){
       total_score += 5;
       return_loop();
     }
-    if(score6 < z_sum){
+    if(score5 < z_sum){
       total_score += 6;
       return_loop();
     }
