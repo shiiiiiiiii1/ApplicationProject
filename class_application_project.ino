@@ -1,6 +1,6 @@
 #include <Adafruit_NeoPixel.h>
 
-const int num_leds = 1;   // 制御するledの数
+const int num_leds = 45;   // 制御するledの数
 const int led_pin = 6;   // led degital I/O pin
 const int flash_pin = 7;   // flash degital I/O pin
 
@@ -50,47 +50,15 @@ void loop(){
         delay(50);
         digitalWrite(flash_pin, LOW);
       }
-      return_loop();
+      return_loop_normal();
     }
     if(medium_error < z_sum && z_sum < large_error){
       change_ledcolor(255, 255, 0);
-      return_loop();
+      return_loop_normal();
     }
     if(large_error < z_sum){
       change_ledcolor(255, 0, 0);
-      return_loop();
+      return_loop_normal();
     }
   }
-}
-
-
-void change_ledcolor(int r, int g, int b) {
-  for(int i=0; i<num_leds; i++){
-    rgbled.setPixelColor(i, rgbled.Color(r, g, b));
-    rgbled.show();
-  }
-}
-
-void return_loop() {
-  while(1){
-    delay(50);
-    acceleration_read();
-    if(x<low_acceleration || high_acceleration<x || y<low_acceleration || high_acceleration<y){
-      change_ledcolor(255, 255, 255);
-      delay(200);
-      break;
-    }
-  }
-}
-
-void acceleration_read() {
-  x = analogRead(0);
-  y = analogRead(1);
-  z = analogRead(2);
-  x = x<10 ? 0 : x;
-  x = x>1013 ? 1023 : x;
-  y = y<10 ? 0 : y;
-  y = y>1013 ? 1023 : y;
-  z = z<10 ? 0 : z;
-  z = z>1013 ? 1023 : z;
 }
