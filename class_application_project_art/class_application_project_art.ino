@@ -1,6 +1,6 @@
 #include <Adafruit_NeoPixel.h>
 
-const int num_leds = 1;   // 制御するledの数
+const int num_leds = 45;   // 制御するledの数
 const int led_pin = 6;   // led degital I/O pin
 const int flash_pin = 7;   // flash degital I/O pin
 
@@ -18,7 +18,6 @@ void setup(){
     rgbled.setPixelColor(i, rgbled.Color(255, 255, 255));
     rgbled.show();   // 反映
   }
-  Serial.begin(9600);
   pinMode(flash_pin, OUTPUT);
   digitalWrite(flash_pin, LOW);
 }
@@ -39,11 +38,6 @@ void loop(){
     acceleration = map(acceleration, -717, 84, 360, 0);
   }
   H += acceleration;
-
-  Serial.println(acceleration);
-
-  // Serial.println(current_H);
-  // Serial.println(H);
 
   if(H <= 360){
     if(5 <= acceleration && acceleration <= 20){
