@@ -1,6 +1,6 @@
 #include <Adafruit_NeoPixel.h>
 
-const int num_leds = 1;   // 制御するledの数
+const int num_leds = 45;   // 制御するledの数
 const int led_pin = 6;   // led degital I/O pin
 const int flash_pin = 7;   // flash degital I/O pin
 
@@ -34,7 +34,9 @@ void loop(){
 
   // フリスビー投げられた時の処理
   if(x<low_acceleration || high_acceleration<x || y<low_acceleration || high_acceleration<y){
-    change_ledcolor(0, 0, 255);
+    if(total_score == 0){
+      change_ledcolor(0, 0, 255);
+    }
     delay(100);
     int z_before_val = analogRead(2);
     int z_difference = 0;
@@ -49,27 +51,27 @@ void loop(){
 
     if(z_sum < score1){
       total_score += 1;
-      return_loop();
+      return_loop_bomb();
     }
     if(score1 < z_sum && z_sum < score2){
       total_score += 2;
-      return_loop();
+      return_loop_bomb();
     }
     if(score2 < z_sum && z_sum < score3){
       total_score += 3;
-      return_loop();
+      return_loop_bomb();
     }
     if(score3 < z_sum && z_sum < score4){
       total_score += 4;
-      return_loop();
+      return_loop_bomb();
     }
     if(score4 < z_sum && z_sum < score5){
       total_score += 5;
-      return_loop();
+      return_loop_bomb();
     }
     if(score5 < z_sum){
       total_score += 6;
-      return_loop();
+      return_loop_bomb();
     }
   }
 }
@@ -82,20 +84,42 @@ void change_ledcolor(int r, int g, int b) {
   }
 }
 
-void remaind_decision(int current_score) {
-  if(10 <= current_score && current_score < 20){
-    change_ledcolor(255, 255, 0);
+void change_rgb_bomb(int current_H){
+  if(current_H <= 120) {
+    R = map(current_H, 0, 120, 255, 0);
+    G = map(current_H, 0, 120, 0, 255);
+    B = 0;
+  } else if (current_H <= 240) {
+    G = map(current_H, 120, 240, 255, 0);
+    B = map(current_H, 120, 240, 0, 255);
+    R = 0;
+  } else {
+    B = map(current_H, 240, 360, 255, 0);
+    R = map(current_H, 240, 360, 0, 255);
+    G= 0;
   }
-  if(20 <= current_score && current_score < 30){
+  change_ledcolor(R, G, B);
+}
+
+void remaind_decision(int current_score) {
+  if(25 <= current_score){
     change_ledcolor(255, 0, 0);
+  }
+  if(current_score < 25){
+    float conversion_H_score = map(current_score, 0, 29, 119, 0);
+    R = map(conversion_H_score, 0, 120, 255, 0);
+    G = map(conversion_H_score, 0, 120, 0, 255);
+    B = 0;
+    change_ledcolor(R, G, B);
   }
 }
 
-void return_loop() {
+void return_loop_bomb() {
   while(1){
     delay(50);
     acceleration_read();
     if(x<low_acceleration || high_acceleration<x || y<low_acceleration || high_acceleration<y){
+      remaind_decision(total_score);
       if(total_score >= over_score){
         delay(50);
         digitalWrite(flash_pin, HIGH);
