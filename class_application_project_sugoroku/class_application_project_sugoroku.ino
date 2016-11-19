@@ -1,6 +1,6 @@
 #include <Adafruit_NeoPixel.h>
 
-const int num_leds = 1;   // 制御するledの数
+const int num_leds = 45;   // 制御するledの数
 const int led_pin = 6;   // led degital I/O pin
 const int flash_pin = 7;   // flash degital I/O pin
 
@@ -48,32 +48,32 @@ void loop(){
     if(z_sum < score5){
       total_score += 6;
       change_ledcolor(0, 0, 255);
-      return_loop();
+      return_loop_sugoroku();
     }
     if(score5 < z_sum && z_sum < score4){
       total_score += 5;
       change_ledcolor(0, 255, 255);
-      return_loop();
+      return_loop_sugoroku();
     }
     if(score4 < z_sum && z_sum < score3){
       total_score += 4;
       change_ledcolor(0, 255, 0);
-      return_loop();
+      return_loop_sugoroku();
     }
     if(score3 < z_sum && z_sum < score2){
       total_score += 3;
       change_ledcolor(255, 255, 0);
-      return_loop();
+      return_loop_sugoroku();
     }
     if(score2 < z_sum && z_sum < score1){
       total_score += 2;
       change_ledcolor(255, 105, 180);
-      return_loop();
+      return_loop_sugoroku();
     }
     if(score1 < z_sum){
       total_score += 1;
       change_ledcolor(255, 0, 0);
-      return_loop();
+      return_loop_sugoroku();
     }
   }
 }
@@ -87,6 +87,7 @@ void change_ledcolor(int r, int g, int b) {
 }
 
 void score_led() {
+  delay(500);
   total_score = total_score>num_leds ? total_score-num_leds : total_score;
   if(total_score < num_leds){
     for(int i=0; i<total_score; i++){
@@ -104,9 +105,15 @@ void score_led() {
     delay(50);
     digitalWrite(flash_pin, LOW);
   }
+  // if(total_score >= num_leds){
+  //   delay(50);
+  //   digitalWrite(flash_pin, HIGH);
+  //   delay(50);
+  //   digitalWrite(flash_pin, LOW);
+  // }
 }
 
-void return_loop() {
+void return_loop_sugoroku() {
   while(1){
     delay(50);
     acceleration_read();
