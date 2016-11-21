@@ -40,13 +40,15 @@ void loop(){
   H += acceleration;
 
   if(H <= 360){
-    if(5 <= acceleration && acceleration <= 20){
+    if(5 <= acceleration && acceleration <= 20){   // 動いてない場合
       change_rgb(current_H, current_H);
-      H = current_H;
+      // H = current_H;
+      H -= acceleration;
+    } else {   // 動いてる場合
+      change_rgb(current_H, H);
     }
-    change_rgb(current_H, H);
+    current_H = H;
   }
-  current_H = H;
   if(H > 360){
     int extra_H = H - 360;
     H = 360;
