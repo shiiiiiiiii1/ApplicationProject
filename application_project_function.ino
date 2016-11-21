@@ -17,6 +17,14 @@ void change_ledcolor(int r, int g, int b) {
   }
 }
 
+void flashing() {
+  delay(1000);
+  digitalWrite(flash_pin, HIGH);
+  delay(1000);
+  digitalWrite(flash_pin, LOW);
+
+}
+
 
 /* normal mode function */
 
