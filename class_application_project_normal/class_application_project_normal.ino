@@ -45,9 +45,9 @@ void loop(){
     if(z_sum < medium_error){
       change_ledcolor(0, 0, 255);
       if(z_sum < small_error){   // フラッシュ判定
-        delay(50);
+        delay(1000);
         digitalWrite(flash_pin, HIGH);
-        delay(50);
+        delay(1000);
         digitalWrite(flash_pin, LOW);
       }
       return_loop_normal();
