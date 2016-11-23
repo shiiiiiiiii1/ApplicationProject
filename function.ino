@@ -1,3 +1,4 @@
+// for mode change
 void rotation() {
   int val_counterclockwise = digitalRead(encoder_counterclockwise_pin);
   int val_clockwise = digitalRead(encoder_clockwise_pin);
@@ -27,7 +28,6 @@ void rotation() {
     }
   }
 }
-
 void mode_color_change(int current_rotation) {
   switch(current_rotation){
     case 0:   // 色なしの色
@@ -73,51 +73,59 @@ void mode_color_change(int current_rotation) {
   }
 }
 
-// void acceleration_read() {
-//   x = analogRead(0);
-//   y = analogRead(1);
-//   z = analogRead(2);
-//   x = x<10 ? 0 : x;
-//   x = x>1013 ? 1023 : x;
-//   y = y<10 ? 0 : y;
-//   y = y>1013 ? 1023 : y;
-//   z = z<10 ? 0 : z;
-//   z = z>1013 ? 1023 : z;
-// }
+// for all mode
+int acceleration_decision() {
+  int z_old_val = analogRead(acceleration_z_analogpin);
+  int z_difference = 0;
+  int z_sum = 0;
+  for(int i=0; i<2; i++){
+    delay(50);
+    z = analogRead(acceleration_z_analogpin);
+    z_difference = abs(z_old_val - z);
+    z_sum += z_difference;
+    z_old_val = z;
+  }
+  return z_sum;
+}
+void acceleration_read() {
+  x = analogRead(acceleration_x_analogpin);
+  y = analogRead(acceleration_y_analogpin);
+  z = analogRead(acceleration_z_analogpin);
+  x = x<10 ? 0 : x;
+  x = x>1013 ? 1023 : x;
+  y = y<10 ? 0 : y;
+  y = y>1013 ? 1023 : y;
+  z = z<10 ? 0 : z;
+  z = z>1013 ? 1023 : z;
+}
+void change_ledcolor(int r, int g, int b) {
+  for(int i=0; i<num_leds; i++){
+    rgbled.setPixelColor(i, rgbled.Color(r, g, b));
+    rgbled.show();
+  }
+}
+void flashing() {
+  delay(1000);
+  digitalWrite(flash_pin, HIGH);
+  delay(1000);
+  digitalWrite(flash_pin, LOW);
+}
 
-// void change_ledcolor(int r, int g, int b) {
-//   for(int i=0; i<num_leds; i++){
-//     rgbled.setPixelColor(i, rgbled.Color(r, g, b));
-//     rgbled.show();
-//   }
-// }
-
-// void flashing() {
-//   delay(1000);
-//   digitalWrite(flash_pin, HIGH);
-//   delay(1000);
-//   digitalWrite(flash_pin, LOW);
-
-// }
+// for normal mode
+void return_loop_normal() {
+  while(1){
+    delay(50);
+    acceleration_read();
+    if(x<low_acceleration || high_acceleration<x || y<low_acceleration || high_acceleration<y){
+      change_ledcolor(255, 255, 255);
+      delay(200);
+      break;
+    }
+  }
+}
 
 
-// /* normal mode function */
-
-// void return_loop_normal() {
-//   while(1){
-//     delay(50);
-//     acceleration_read();
-//     if(x<low_acceleration || high_acceleration<x || y<low_acceleration || high_acceleration<y){
-//       change_ledcolor(255, 255, 255);
-//       delay(200);
-//       break;
-//     }
-//   }
-// }
-
-
-// // /* art mode function */
-
+// // for art mode
 // // void change_rgb(int current_H, int H){
 // //   for(int i=0; current_H<=H; current_H++){
 // //     if(current_H <= 120) {
@@ -139,8 +147,7 @@ void mode_color_change(int current_rotation) {
 // // }
 
 
-// // /* fugoroku mode function */
-
+// // for fugoroku mode
 // // void return_loop_sugoroku() {
 // //   while(1){
 // //     delay(50);
@@ -175,8 +182,7 @@ void mode_color_change(int current_rotation) {
 // // }
 
 
-// // /* bomb mode function */
-
+// // for bomb mode
 // // void return_loop_bomb() {
 // //   while(1){
 // //     delay(50);

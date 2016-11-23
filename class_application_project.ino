@@ -1,5 +1,4 @@
 #include <Adafruit_NeoPixel.h>
-
 // ピン設定
 const int acceleration_x_analogpin = 0;
 const int acceleration_y_analogpin = 1;
@@ -12,31 +11,35 @@ const int encoder_switch_analogpin = 3;
 const int cyan_pin = 9;
 const int magenta_pin = 10;
 const int yellow_pin = 11;
-
-// const int num_leds = 45;   // 制御するledの数
-
-int default_rotation = 1;
+// 固定変数
+const int default_rotation = 1;   // 回転の初期値
+const int num_leds = 45;   // 制御するledの数
+const int bright_led = 50;   // ledの明るさ設定値(0~255)
+const int small_error = 100;   // 誤差範囲の一番小さい値(Flash用の誤差の値)
+const int medium_error = 125;
+const int large_error = 250;
+const int low_acceleration = 24;   // 急激な加速度の検知
+const int high_acceleration = 1000;   // 急激な加速度の検知
+// rgbledのインスタンスの生成
+Adafruit_NeoPixel rgbled = Adafruit_NeoPixel(num_leds, led_pin, NEO_GRB + NEO_KHZ800);
+// グローバル変数
+int x, y, z;
 int direction_rotation = 0;   // どっちに回したか保管用
 int current_rotation = default_rotation;   // 現在の値保管用
-int old_rotation = default_rotation;   // 一個前の値保管用
-
-
-int sw_reset_count = 0;
-
-// Adafruit_NeoPixel rgbled = Adafruit_NeoPixel(num_leds, led_pin, NEO_GRB + NEO_KHZ800);
-
-// int x, y, z;
-// int small_error = 100;   // 誤差範囲の一番小さい値(Flash用の誤差の値)
-// int medium_error = 125;
-// int large_error = 250;
-// int low_acceleration = 24;   // 急激な加速度の検知
-// int high_acceleration = 1000;   // 急激な加速度の検知
-
 
 void setup() {
   Serial.begin(9600);
+  rgbled.begin();
   pinMode(encoder_counterclockwise_pin, INPUT_PULLUP);
   pinMode(encoder_clockwise_pin, INPUT_PULLUP);
+  pinMode(flash_pin, OUTPUT);
+  digitalWrite(flash_pin, LOW);
+  for(int i=0; i<=num_leds; i++){
+    rgbled.setBrightness(bright_led);   // 明るさ指定(0~255)
+    rgbled.setPixelColor(i, rgbled.Color(255, 255, 255));
+    rgbled.show();   // 反映
+  }
+
 }
 
 void loop() {
