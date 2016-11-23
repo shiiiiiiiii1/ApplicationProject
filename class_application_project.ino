@@ -26,6 +26,12 @@ Adafruit_NeoPixel rgbled = Adafruit_NeoPixel(num_leds, led_pin, NEO_GRB + NEO_KH
 int x, y, z;
 int direction_rotation = 0;   // どっちに回したか保管用
 int current_rotation = default_rotation;   // 現在の値保管用
+// ヘッダーファイルの読み込み
+#include "function.h"
+#include "mode_normal.h"
+#include "mode_art.h"
+#include "mode_sugoroku.h"
+#include "mode_bomb.h"
 
 void setup() {
   Serial.begin(9600);
@@ -39,7 +45,6 @@ void setup() {
     rgbled.setPixelColor(i, rgbled.Color(255, 255, 255));
     rgbled.show();   // 反映
   }
-
 }
 
 void loop() {
