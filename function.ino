@@ -1,10 +1,8 @@
 void rotation() {
   int val_counterclockwise = digitalRead(encoder_counterclockwise_pin);
   int val_clockwise = digitalRead(encoder_clockwise_pin);
-  int rotation_min = 0;
-  int rotation_max = 3;   // 0番目からのモード数
-  delay(1);
-  mode_color_change();
+  int rotation_min = default_rotation;   // 1
+  int rotation_max = 4;   // モード数
 
   if(val_counterclockwise == HIGH && val_clockwise == HIGH){   // 回してない時
     if(direction_rotation == 1){   // 一回前に右回りしてたら
@@ -28,45 +26,46 @@ void rotation() {
       direction_rotation = -1;   // direction_rotationの値に左回りしたことを保管
     }
   }
-  if(old_rotation != current_rotation){   // 前の値と今の値が異なったら
-    old_rotation = current_rotation;   // 一回前の値を格納する
-    Serial.println(old_rotation);
-  }
 }
 
-void mode_color_change() {
+void mode_color_change(int current_rotation) {
   switch(current_rotation){
-    case 0: //RED
+    case 0:   // 色なしの色
+      analogWrite(cyan_pin, 255);
+      analogWrite(magenta_pin, 255);
+      analogWrite(yellow_pin, 255);
+      break;
+    case 1: // mode normal
       analogWrite(cyan_pin, 0);
       analogWrite(magenta_pin, 255);
       analogWrite(yellow_pin, 255);
       break;
-    case 1: //GREEN
+    case 2: // mode sugoroku
       analogWrite(cyan_pin, 255);
       analogWrite(magenta_pin, 0);
       analogWrite(yellow_pin, 255);
       break;
-    case 2: //YELLOW
+    case 3: // mode art
       analogWrite(cyan_pin, 0);
       analogWrite(magenta_pin, 0);
       analogWrite(yellow_pin, 255);
       break;
-    case 3: //BLUE
+    case 4: // mode bomb
       analogWrite(cyan_pin, 255);
       analogWrite(magenta_pin, 255);
       analogWrite(yellow_pin, 0);
       break;
-    case 4: //PINK
+    case 5: //PINK
       analogWrite(cyan_pin, 0);
       analogWrite(magenta_pin, 255);
       analogWrite(yellow_pin, 0);
       break;
-    case 5: //SKY BLUE
+    case 6: //SKY BLUE
       analogWrite(cyan_pin, 255);
       analogWrite(magenta_pin, 0);
       analogWrite(yellow_pin, 0);
       break;
-    case 6: //WHITE
+    case 7: //WHITE
       analogWrite(cyan_pin, 0);
       analogWrite(magenta_pin, 0);
       analogWrite(yellow_pin, 0);

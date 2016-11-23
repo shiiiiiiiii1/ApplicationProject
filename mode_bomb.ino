@@ -1,0 +1,3 @@
+void mode_bomb() {
+
+}
