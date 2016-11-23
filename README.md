@@ -12,6 +12,7 @@
 - マイコン内臓RGBテープLED(NeoPixel)
 - 写ルンです フラッシュ部分
 - Arduino用 Relay Module V3
+- フルカラーRGBLED付ロータリーエンコーダ
 
 ## 参考資料 
 - [Adafruit_NeoPixelライブラリ使いかた](http://www.jonki.net/entry/2014/12/17/130536)
