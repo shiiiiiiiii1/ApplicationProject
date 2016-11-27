@@ -1,4 +1,4 @@
-// for mode change
+// for mode change   ---------------------------------------------------------------
 void rotation() {
   int val_counterclockwise = digitalRead(encoder_counterclockwise_pin);
   int val_clockwise = digitalRead(encoder_clockwise_pin);
@@ -73,7 +73,7 @@ void mode_color_change(int current_rotation) {
   }
 }
 
-// for all mode
+// for all mode   ---------------------------------------------------------------
 int acceleration_decision() {
   int z_old_val = analogRead(acceleration_z_analogpin);
   int z_difference = 0;
@@ -111,7 +111,7 @@ void flashing() {
   digitalWrite(flash_pin, LOW);
 }
 
-// for normal mode
+// for normal mode   ---------------------------------------------------------------
 void return_loop_normal() {
   while(1){
     delay(50);
@@ -124,8 +124,7 @@ void return_loop_normal() {
   }
 }
 
-
-// // for art mode
+// // for art mode   ---------------------------------------------------------------
 // // void change_rgb(int current_H, int H){
 // //   for(int i=0; current_H<=H; current_H++){
 // //     if(current_H <= 120) {
@@ -146,43 +145,37 @@ void return_loop_normal() {
 // //   }
 // // }
 
+// for sugoroku mode   ---------------------------------------------------------------
+void score_led() {
+  delay(500);
+  total_score_sugoroku = total_score_sugoroku>num_leds ? total_score_sugoroku-num_leds : total_score_sugoroku;
+  if(total_score_sugoroku < num_leds){
+    for(int i=0; i<total_score_sugoroku; i++){
+      rgbled.setPixelColor(i, rgbled.Color(255, 255, 255));
+      rgbled.show();
+    }
+    for(int i=total_score_sugoroku; i<num_leds; i++){
+      rgbled.setPixelColor(i, rgbled.Color(0, 0, 0));
+      rgbled.show();
+    }
+  }
+  if(total_score_sugoroku == num_leds){
+    flashing();
+  }
+}
+void return_loop_sugoroku() {
+  while(1){
+    delay(50);
+    acceleration_read();
+    if(x<low_acceleration || high_acceleration<x || y<low_acceleration || high_acceleration<y){
+      score_led();
+      delay(200);
+      break;
+    }
+  }
+}
 
-// // for fugoroku mode
-// // void return_loop_sugoroku() {
-// //   while(1){
-// //     delay(50);
-// //     acceleration_read();
-// //     if(x<low_acceleration || high_acceleration<x || y<low_acceleration || high_acceleration<y){
-// //       score_led();
-// //       delay(200);
-// //       break;
-// //     }
-// //   }
-// // }
-
-// // void score_led() {
-// //   delay(500);
-// //   total_score = total_score>num_leds ? total_score-num_leds : total_score;
-// //   if(total_score < num_leds){
-// //     for(int i=0; i<total_score; i++){
-// //       rgbled.setPixelColor(i, rgbled.Color(255, 0, 0));
-// //       rgbled.show();
-// //     }
-// //     for(int i=total_score; i<num_leds; i++){
-// //       rgbled.setPixelColor(i, rgbled.Color(0, 0, 0));
-// //       rgbled.show();
-// //     }
-// //   }
-// //   if(total_score == num_leds){
-// //     delay(50);
-// //     digitalWrite(flash_pin, HIGH);
-// //     delay(50);
-// //     digitalWrite(flash_pin, LOW);
-// //   }
-// // }
-
-
-// // for bomb mode
+// // for bomb mode   ---------------------------------------------------------------
 // // void return_loop_bomb() {
 // //   while(1){
 // //     delay(50);
