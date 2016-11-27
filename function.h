@@ -146,17 +146,6 @@ void return_loop_normal() {
 // // }
 
 // for sugoroku mode   ---------------------------------------------------------------
-void return_loop_sugoroku(int total_score) {
-  while(1){
-    delay(50);
-    acceleration_read();
-    if(x<low_acceleration || high_acceleration<x || y<low_acceleration || high_acceleration<y){
-      score_led(total_score);
-      delay(200);
-      break;
-    }
-  }
-}
 void score_led(int total_score) {
   delay(500);
   total_score = total_score<=num_leds ? total_score : total_score-num_leds;
@@ -174,19 +163,44 @@ void score_led(int total_score) {
     flashing();
   }
 }
-
-// for bomb mode   ---------------------------------------------------------------
-void return_loop_bomb(int total_score, int max_score) {
+void return_loop_sugoroku(int total_score) {
   while(1){
     delay(50);
     acceleration_read();
     if(x<low_acceleration || high_acceleration<x || y<low_acceleration || high_acceleration<y){
-      if(total_score >= max_score){
-        flashing();
-        total_score = 0;
-      }
+      score_led(total_score);
       delay(200);
       break;
+    }
+  }
+}
+
+// for bomb mode   ---------------------------------------------------------------
+void warning_change_color(int current_score) {
+  if(current_score < 25){
+    int R, G, B;
+    R = map(current_score, 0, 24, 0, 255);
+    G = map(current_score, 0, 24, 255, 0);
+    B = 0;
+    change_ledcolor(R, G, B);
+  }
+  if(25 <= current_score){
+    change_ledcolor(255, 0, 0);
+  }
+}
+int return_loop_bomb(int current_score) {
+  int max_score = 30;
+  while(1){
+    delay(50);
+    acceleration_read();
+    if(x<low_acceleration || high_acceleration<x || y<low_acceleration || high_acceleration<y){
+      warning_change_color(current_score);
+      if(current_score >= max_score){
+        flashing();
+        current_score = 0;
+      }
+      delay(200);
+      return current_score;
     }
   }
 }

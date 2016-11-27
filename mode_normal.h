@@ -1,7 +1,7 @@
 void mode_normal() {
 Serial.println("normal mode start");
-delay(mode_change_delay);
-change_ledcolor(255, 255, 255);
+  delay(mode_change_delay);
+  change_ledcolor(255, 255, 255);
   while(1){
     acceleration_read();
     // フリスビー投げられた時の処理

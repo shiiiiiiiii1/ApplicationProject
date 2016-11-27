@@ -1,8 +1,8 @@
 void mode_bomb() {
+Serial.println("bomb mode start");
   delay(mode_change_delay);
   change_ledcolor(255, 255, 255);
   int total_score = 0;
-  int max_score = 30;
   while(1){
     acceleration_read();
     // フリスビー投げられた時の処理
@@ -10,32 +10,33 @@ void mode_bomb() {
       delay(100);
       int z_sum = acceleration_decision();
       if(total_score == 0){
-        change_ledcolor(0, 0, 255);
+        change_ledcolor(0, 255, 0);
       }
       if(z_sum < error_small){
         total_score += 1;
-        return_loop_bomb(total_score, max_score);
+        total_score = return_loop_bomb(total_score);
       }
       if(error_small < z_sum && z_sum < error_samll_middle){
         total_score += 2;
-        return_loop_bomb(total_score, max_score);
+        total_score = return_loop_bomb(total_score);
       }
       if(error_samll_middle < z_sum && z_sum < error_middle){
         total_score += 3;
-        return_loop_bomb(total_score, max_score);
+        total_score = return_loop_bomb(total_score);
       }
       if(error_middle < z_sum && z_sum < error_large_middle){
         total_score += 4;
-        return_loop_bomb(total_score, max_score);
+        total_score = return_loop_bomb(total_score);
       }
       if(error_large_middle < z_sum && z_sum < error_large){
         total_score += 5;
-        return_loop_bomb(total_score, max_score);
+        total_score = return_loop_bomb(total_score);
       }
       if(error_large < z_sum){
         total_score += 6;
-        return_loop_bomb(total_score, max_score);
+        total_score = return_loop_bomb(total_score);
       }
+Serial.print(total_score);
     }
 
     int encoder_switch_val = analogRead(encoder_switch_analogpin);

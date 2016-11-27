@@ -1,4 +1,5 @@
 void mode_sugoroku() {
+Serial.println("sugoroku mode start");
   delay(mode_change_delay);
   change_ledcolor(255, 255, 255);
   int total_score = 0;   // すごろくモードでの初期化
