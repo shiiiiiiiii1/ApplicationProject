@@ -146,29 +146,29 @@ void return_loop_normal() {
 // // }
 
 // for sugoroku mode   ---------------------------------------------------------------
-void score_led() {
+void score_led(int total_score) {
   delay(500);
-  total_score_sugoroku = total_score_sugoroku<=num_leds ? total_score_sugoroku : total_score_sugoroku-num_leds;
-  if(total_score_sugoroku < num_leds){
-    for(int i=0; i<total_score_sugoroku; i++){
+  total_score = total_score<=num_leds ? total_score : total_score-num_leds;
+  if(total_score < num_leds){
+    for(int i=0; i<total_score; i++){
       rgbled.setPixelColor(i, rgbled.Color(255, 255, 255));
       rgbled.show();
     }
-    for(int i=total_score_sugoroku; i<num_leds; i++){
+    for(int i=total_score; i<num_leds; i++){
       rgbled.setPixelColor(i, rgbled.Color(0, 0, 0));
       rgbled.show();
     }
   }
-  if(total_score_sugoroku == num_leds){
+  if(total_score == num_leds){
     flashing();
   }
 }
-void return_loop_sugoroku() {
+void return_loop_sugoroku(int total_score) {
   while(1){
     delay(50);
     acceleration_read();
     if(x<low_acceleration || high_acceleration<x || y<low_acceleration || high_acceleration<y){
-      score_led();
+      score_led(total_score);
       delay(200);
       break;
     }
