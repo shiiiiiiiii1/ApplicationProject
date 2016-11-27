@@ -148,7 +148,7 @@ void return_loop_normal() {
 // for sugoroku mode   ---------------------------------------------------------------
 void score_led() {
   delay(500);
-  total_score_sugoroku = total_score_sugoroku>num_leds ? total_score_sugoroku-num_leds : total_score_sugoroku;
+  total_score_sugoroku = total_score_sugoroku<=num_leds ? total_score_sugoroku : total_score_sugoroku-num_leds;
   if(total_score_sugoroku < num_leds){
     for(int i=0; i<total_score_sugoroku; i++){
       rgbled.setPixelColor(i, rgbled.Color(255, 255, 255));
@@ -175,21 +175,18 @@ void return_loop_sugoroku() {
   }
 }
 
-// // for bomb mode   ---------------------------------------------------------------
-// // void return_loop_bomb() {
-// //   while(1){
-// //     delay(50);
-// //     acceleration_read();
-// //     if(x<low_acceleration || high_acceleration<x || y<low_acceleration || high_acceleration<y){
-// //       if(total_score >= over_score){
-// //         delay(50);
-// //         digitalWrite(flash_pin, HIGH);
-// //         delay(50);
-// //         digitalWrite(flash_pin, LOW);
-// //         total_score = 0;
-// //       }
-// //       delay(200);
-// //       break;
-// //     }
-// //   }
-// // }
+// for bomb mode   ---------------------------------------------------------------
+void return_loop_bomb(int total_score, int max_score) {
+  while(1){
+    delay(50);
+    acceleration_read();
+    if(x<low_acceleration || high_acceleration<x || y<low_acceleration || high_acceleration<y){
+      if(total_score >= max_score){
+        flashing();
+        total_score = 0;
+      }
+      delay(200);
+      break;
+    }
+  }
+}

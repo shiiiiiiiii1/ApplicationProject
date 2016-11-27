@@ -30,6 +30,7 @@ int x, y, z;
 int direction_rotation = 0;   // どっちに回したか保管用
 int current_rotation = default_rotation;   // 現在の値保管用
 int total_score_sugoroku = 0;
+int total_score_bomb = 0;
 // ヘッダーファイルの読み込み
 #include "function.h"
 #include "mode_normal.h"
