@@ -15,17 +15,21 @@ const int yellow_pin = 11;
 const int default_rotation = 1;   // 回転の初期値
 const int num_leds = 45;   // 制御するledの数
 const int bright_led = 50;   // ledの明るさ設定値(0~255)
-const int small_error = 100;   // 誤差範囲の一番小さい値(Flash用の誤差の値)
-const int medium_error = 125;
-const int large_error = 250;
+const int error_small = 100;   // 誤差範囲の一番小さい値(Flash用の誤差の値)
+const int error_samll_middle = 125;
+const int error_middle = 150;
+const int error_large_middle = 175;
+const int error_large = 200;
 const int low_acceleration = 24;   // 急激な加速度の検知
 const int high_acceleration = 1000;   // 急激な加速度の検知
+const int mode_change_delay = 1500;   // モードの開始・終了までのdelay
 // rgbledのインスタンスの生成
 Adafruit_NeoPixel rgbled = Adafruit_NeoPixel(num_leds, led_pin, NEO_GRB + NEO_KHZ800);
 // グローバル変数
 int x, y, z;
 int direction_rotation = 0;   // どっちに回したか保管用
 int current_rotation = default_rotation;   // 現在の値保管用
+int total_score_sugoroku = 0;
 // ヘッダーファイルの読み込み
 #include "function.h"
 #include "mode_normal.h"
@@ -63,13 +67,13 @@ void loop() {
   if(current_rotation == 2){
     if(encoder_switch_val > 1022){
       mode_color_change(0);
-      mode_sugoroku();
+      mode_art();
     }
   }
   if(current_rotation == 3){
     if(encoder_switch_val > 1019){
       mode_color_change(0);
-      mode_art();
+      mode_sugoroku();
     }
   }
   if(current_rotation == 4){
