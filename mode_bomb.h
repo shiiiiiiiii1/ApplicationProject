@@ -36,7 +36,6 @@ Serial.println("bomb mode start");
         total_score += 6;
         total_score = return_loop_bomb(total_score);
       }
-Serial.print(total_score);
     }
 
     int encoder_switch_val = analogRead(encoder_switch_analogpin);
