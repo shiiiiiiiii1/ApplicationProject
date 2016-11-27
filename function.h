@@ -146,6 +146,17 @@ void return_loop_normal() {
 // // }
 
 // for sugoroku mode   ---------------------------------------------------------------
+void return_loop_sugoroku(int total_score) {
+  while(1){
+    delay(50);
+    acceleration_read();
+    if(x<low_acceleration || high_acceleration<x || y<low_acceleration || high_acceleration<y){
+      score_led(total_score);
+      delay(200);
+      break;
+    }
+  }
+}
 void score_led(int total_score) {
   delay(500);
   total_score = total_score<=num_leds ? total_score : total_score-num_leds;
@@ -161,17 +172,6 @@ void score_led(int total_score) {
   }
   if(total_score == num_leds){
     flashing();
-  }
-}
-void return_loop_sugoroku(int total_score) {
-  while(1){
-    delay(50);
-    acceleration_read();
-    if(x<low_acceleration || high_acceleration<x || y<low_acceleration || high_acceleration<y){
-      score_led(total_score);
-      delay(200);
-      break;
-    }
   }
 }
 
