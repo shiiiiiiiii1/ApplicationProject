@@ -1,3 +1,0 @@
-void mode_sugoroku() {
-
-}
