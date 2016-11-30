@@ -124,26 +124,32 @@ void return_loop_normal() {
   }
 }
 
-// // for art mode   ---------------------------------------------------------------
-// // void change_rgb(int current_H, int H){
-// //   for(int i=0; current_H<=H; current_H++){
-// //     if(current_H <= 120) {
-// //       R = map(current_H, 0, 120, 255, 0);
-// //       G = map(current_H, 0, 120, 0, 255);
-// //       B = 0;
-// //     } else if (current_H <= 240) {
-// //       G = map(current_H, 120, 240, 255, 0);
-// //       B = map(current_H, 120, 240, 0, 255);
-// //       R = 0;
-// //     } else {
-// //       B = map(current_H, 240, 360, 255, 0);
-// //       R = map(current_H, 240, 360, 0, 255);
-// //       G= 0;
-// //     }
-// //     change_ledcolor(R, G, B);
-// //     delay(3);
-// //   }
-// // }
+// for art mode   ---------------------------------------------------------------
+int change_rgb(int current_H, int conversion_H){   // delay制御するかどうかまだ変更するかも
+  int R, G, B;
+  int while_finish_val = current_H+conversion_H;
+  while(current_H < while_finish_val){
+    if(current_H <= H_lap/3) {
+      R = map(current_H, 0, H_lap/3, 255, 0);
+      G = map(current_H, 0, H_lap/3, 0, 255);
+      B = 0;
+    }
+    if(H_lap/3 < current_H && current_H <= H_lap*2/3){
+      G = map(current_H, H_lap/3, H_lap*2/3, 255, 0);
+      B = map(current_H, H_lap/3, H_lap*2/3, 0, 255);
+      R = 0;
+    }
+    if(H_lap*2/3 < current_H){
+      B = map(current_H, H_lap*2/3, H_lap, 255, 0);
+      R = map(current_H, H_lap*2/3, H_lap, 0, 255);
+      G= 0;
+    }
+    change_ledcolor(R, G, B);
+    current_H++;
+  }
+  return current_H;
+}
+
 
 // for sugoroku mode   ---------------------------------------------------------------
 void score_led(int total_score) {

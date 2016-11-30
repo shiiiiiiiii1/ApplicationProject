@@ -20,9 +20,10 @@ const int error_samll_middle = 125;
 const int error_middle = 150;
 const int error_large_middle = 175;
 const int error_large = 200;
-const int low_acceleration = 24;   // 急激な加速度の検知
+const int low_acceleration = 24;   // 急激な加速度の検知の差分
 const int high_acceleration = 1000;   // 急激な加速度の検知
 const int mode_change_delay = 1500;   // モードの開始・終了までのdelay
+const int H_lap = 120;   // artmodeの色変化の一周を何分割にするか(1/3できる数が良い)
 // rgbledのインスタンスの生成
 Adafruit_NeoPixel rgbled = Adafruit_NeoPixel(num_leds, led_pin, NEO_GRB + NEO_KHZ800);
 // グローバル変数
