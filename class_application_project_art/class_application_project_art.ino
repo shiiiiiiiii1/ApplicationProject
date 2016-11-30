@@ -1,13 +1,19 @@
+/*
+* 変数名などの整理をして実際のモード切り替えのコードに移植する。
+*
+*/
+
 #include <Adafruit_NeoPixel.h>
 
 const int num_leds = 45;   // 制御するledの数
 const int led_pin = 6;   // led degital I/O pin
 const int flash_pin = 7;   // flash degital I/O pin
 
+const int H_lap = 120;   // Hの一周の分割数。大きくするほど一周するのに時間がかかる。
+
 Adafruit_NeoPixel rgbled = Adafruit_NeoPixel(num_leds, led_pin, NEO_GRB + NEO_KHZ800);
 
 int x, y, z, R, G, B, acceleration;
-int H = 0;
 int current_H = 0;
 
 
@@ -24,77 +30,65 @@ Serial.begin(9600);
 }
 
 void loop(){
+  // 加速度検知
   acceleration_read();
-  x = map(x, 0, 1023, -511, 512);
-  y = map(y, 0, 1023, -511, 512);
-  z = map(z, 0, 1023, 512, -511);
-  float x2 = pow(x, 2.0);
-  float y2 = pow(y, 2.0);
-  float z2 = pow(z, 2.0);
+
+  // 加速度変換
+  int x_map = map(x, 0, 1023, -511, 512);
+  int y_map = map(y, 0, 1023, -511, 512);
+  int z_map = map(z, 0, 1023, 512, -511);
+
+  // 加速度の合成
+  float x2 = pow(x_map, 2.0);
+  float y2 = pow(y_map, 2.0);
+  float z2 = pow(z_map, 2.0);
   acceleration = sqrt(x2 + y2 + z2);
-  if(acceleration >= 85){
-    acceleration = map(acceleration, 85, 886, 0, 360);
-  }
-  if(acceleration < 85){
-    acceleration = map(acceleration, -717, 84, 360, 0);
-  }
-Serial.print("H_old : ");
-Serial.print(H);
-Serial.print("  acce : ");
-Serial.println(acceleration);
-  H += acceleration;
-Serial.print("H : ");
-Serial.println(H);
-// ------------------------------------------------------------------------------------------ ここまではOK
 
+  // 加速度が発生している時
+  if(acceleration < 190 || 250 < acceleration){
+    int acceleration_map, conversion_H;
+    acceleration_map = acceleration<190 ? map(acceleration, 220, 0, 0, 220) : acceleration;   // 加速度を0を基準とした値に変換
+    acceleration_map = 250<acceleration ? map(acceleration, 220, 880, 0, 660) : acceleration;   // 加速度を0を基準とした値に変換
+    conversion_H = map(acceleration_map, 0, 660, 0, H_lap);   // 加速度をHの変化量と照らし合わせる値に変換
 
-  if(H <= 360){
-    if(5 <= acceleration && acceleration <= 20){   // 動いてない場合
-      change_rgb(current_H, current_H);
-      // H = current_H;
-      H -= acceleration;
-    } else {   // 動いてる場合
-      change_rgb(current_H, H);
+    // current_H が、最終的に一周よりも大きい値になってしまうかどうかの判定。
+    if(current_H+conversion_H <= H_lap){
+Serial.println("no over H_lap !!!");
+Serial.println(current_H+conversion_H);
+      current_H = change_rgb(current_H, conversion_H);
     }
-    current_H = H;
-  }
-  if(H > 360){
-Serial.print("H　over !? : ");
-Serial.println(H);
-    int extra_H = H - 360;
-    H = 360;
-    change_rgb(current_H, H);
-    current_H = 0;
-    change_rgb(current_H, extra_H);
-    current_H = extra_H;
-    H = current_H;
-Serial.println("H over break!!!!!!!!!");
+    if(H_lap < current_H+conversion_H){   // current_H が、最終的に一周よりも大きい値になってしまう場合。
+Serial.println("over H_lap !!!");
+      change_rgb(current_H, H_lap-current_H);
+      current_H = change_rgb(0, current_H+conversion_H-H_lap);
+    }
   }
   delay(50);
 }
 
 
-void change_rgb(int current_H, int H){
-  while(current_H <= H){
-    if(current_H <= 120) {
-      R = map(current_H, 0, 120, 255, 0);
-      G = map(current_H, 0, 120, 0, 255);
+int change_rgb(int current_H, int conversion_H){
+  int while_finish_val = current_H+conversion_H;
+  while(current_H < while_finish_val){
+    if(current_H <= H_lap/3) {
+      R = map(current_H, 0, H_lap/3, 255, 0);
+      G = map(current_H, 0, H_lap/3, 0, 255);
       B = 0;
-    } else if (current_H <= 240) {
-      G = map(current_H, 120, 240, 255, 0);
-      B = map(current_H, 120, 240, 0, 255);
+    }
+    if(H_lap/3 < current_H && current_H <= H_lap*2/3){
+      G = map(current_H, H_lap/3, H_lap*2/3, 255, 0);
+      B = map(current_H, H_lap/3, H_lap*2/3, 0, 255);
       R = 0;
-    } else {
-      B = map(current_H, 240, 360, 255, 0);
-      R = map(current_H, 240, 360, 0, 255);
+    }
+    if(H_lap*2/3 < current_H){
+      B = map(current_H, H_lap*2/3, H_lap, 255, 0);
+      R = map(current_H, H_lap*2/3, H_lap, 0, 255);
       G= 0;
     }
     change_ledcolor(R, G, B);
     current_H++;
-Serial.print("current_H : ");
-Serial.println(current_H);
-    // delay(3);
   }
+  return current_H;
 }
 void change_ledcolor(int r, int g, int b) {
   for(int i=0; i<num_leds; i++){
