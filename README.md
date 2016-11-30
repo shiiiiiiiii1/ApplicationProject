@@ -1,11 +1,11 @@
 # 2016年度 応用プロジェクト制作（法政大学）
 ハードウェアコンテスト[GUGEN](https://gugen.jp/)に応募しました。   
 見ていっていただけると幸いです。  
-https://gugen.jp/entry2016/2016-124   
-<img src="https://gugen.jp/uploads/20161129200853489.png" width="80%">
+https://gugen.jp/entry2016/2016-124
 
 ## プロダクト名 
-ACTEE
+ACTEE   
+<img src="https://gugen.jp/uploads/20161129200853489.png" width="70%">
 
 ## プロダクトの詳細 
 自らの投げる「動作」により、光の「反応」が返ってくるプロダクト。
