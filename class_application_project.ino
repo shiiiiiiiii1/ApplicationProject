@@ -7,7 +7,7 @@ const int LED_PIN = 6;
 const int FLASH_PIN = 7;
 const int ENCODER_COUNTERCLOCKWISE_PIN = 2;
 const int ENCODER_CLOCKWISE_PIN = 4;
-const int ENCODER_SWITCH_PIN = 3;
+const int ENCODER_SWITCH_PIN = 8;
 const int RED_PIN = 9;
 const int GREEN_PIN = 10;
 const int BLUE_PIN = 11;
@@ -41,6 +41,10 @@ void setup() {
   rgbled.begin();
   pinMode(ENCODER_COUNTERCLOCKWISE_PIN, INPUT_PULLUP);
   pinMode(ENCODER_CLOCKWISE_PIN, INPUT_PULLUP);
+  pinMode(ENCODER_SWITCH_PIN, INPUT);
+  pinMode(RED_PIN, OUTPUT);
+  pinMode(GREEN_PIN, OUTPUT);
+  pinMode(BLUE_PIN, OUTPUT);
   pinMode(FLASH_PIN, OUTPUT);
   digitalWrite(FLASH_PIN, LOW);
   for(int i=0; i<=NUM_LEDS; i++){
@@ -53,32 +57,31 @@ void setup() {
 void loop() {
   rotation();
 
-  int encoder_switch_val = analogRead(ENCODER_SWITCH_PIN);
-  if(encoder_switch_val <= 1019){
-    mode_color_change(current_rotation);
-  }
-  if(current_rotation == 1){
-    if(encoder_switch_val > 1021){
+  mode_color_change(current_rotation);
+
+  bool encoder_switch_val = digitalRead(ENCODER_SWITCH_PIN);
+  if(encoder_switch_val){
+    if(current_rotation == 1){
       mode_color_change(0);
       mode_normal();
+      change_ledcolor(255, 255, 255);
     }
-  }
-  if(current_rotation == 2){
-    if(encoder_switch_val > 1022){
+    if(current_rotation == 2){
       mode_color_change(0);
       mode_art();
+      change_ledcolor(255, 255, 255);
     }
-  }
-  if(current_rotation == 3){
-    if(encoder_switch_val > 1019){
+    if(current_rotation == 3){
       mode_color_change(0);
       mode_sugoroku();
+      change_ledcolor(255, 255, 255);
     }
-  }
-  if(current_rotation == 4){
-    if(encoder_switch_val > 1022){
+    if(current_rotation == 4){
       mode_color_change(0);
       mode_bomb();
+      change_ledcolor(255, 255, 255);
     }
   }
+
+  delay(25);
 }

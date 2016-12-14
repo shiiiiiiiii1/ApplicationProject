@@ -1,74 +1,53 @@
 // for mode change   ---------------------------------------------------------------
 void rotation() {
-  int val_counterclockwise = digitalRead(ENCODER_COUNTERCLOCKWISE_PIN);
-  int val_clockwise = digitalRead(ENCODER_CLOCKWISE_PIN);
+  bool val_counterclockwise = digitalRead(ENCODER_COUNTERCLOCKWISE_PIN);
+  bool val_clockwise = digitalRead(ENCODER_CLOCKWISE_PIN);
   int rotation_min = DEFAULT_ROTATION;   // 1
   int rotation_max = 4;   // モード数
 
-  if(val_counterclockwise == HIGH && val_clockwise == HIGH){   // 回してない時
-    if(direction_rotation == 1){   // 一回前に右回りしてたら
-      current_rotation += 1;
-      if(current_rotation > rotation_max){
-        current_rotation = rotation_max;
-      }
+  if(val_counterclockwise == 0 && val_clockwise == 1){   // 回してない時
+    current_rotation += 1;
+    Serial.println("right");
+    if(current_rotation > rotation_max){
+      current_rotation = rotation_max;
     }
-    if(direction_rotation == -1){   // 一回前に左回りしてたら
-      current_rotation -= 1;
-      if(current_rotation < rotation_min){
-        current_rotation = rotation_min;
-      }
+    delay(100);
+  }
+  if(val_counterclockwise == 1 && val_clockwise == 0){   // どっちかに回転したら
+    current_rotation -= 1;
+    Serial.println("left");
+    if(current_rotation < rotation_min){
+      current_rotation = rotation_min;
     }
-    direction_rotation = 0;   // direction_rotationの値に動かしてないことを保管
-  } else {   // どっちかに回転したら
-    if(val_counterclockwise == LOW){   // 右回りしたら
-      direction_rotation = 1;   // direction_rotationの値に右回りしたことを保管
-    }
-    if(val_clockwise == HIGH){   // 左回りしたら
-      direction_rotation = -1;   // direction_rotationの値に左回りしたことを保管
-    }
+    delay(100);
   }
 }
 void mode_color_change(int current_rotation) {
   switch(current_rotation){
     case 0:   // 色なしの色
-      analogWrite(RED_PIN, 255);
-      analogWrite(GREEN_PIN, 255);
-      analogWrite(BLUE_PIN, 255);
+      digitalWrite(RED_PIN, HIGH);
+      digitalWrite(GREEN_PIN, HIGH);
+      digitalWrite(BLUE_PIN, HIGH);
       break;
     case 1: // mode normal
-      analogWrite(RED_PIN, 0);
-      analogWrite(GREEN_PIN, 255);
-      analogWrite(BLUE_PIN, 255);
+      digitalWrite(RED_PIN, LOW);
+      digitalWrite(GREEN_PIN, HIGH);
+      digitalWrite(BLUE_PIN, HIGH);
       break;
     case 2: // mode sugoroku
-      analogWrite(RED_PIN, 255);
-      analogWrite(GREEN_PIN, 0);
-      analogWrite(BLUE_PIN, 255);
+      digitalWrite(RED_PIN, HIGH);
+      digitalWrite(GREEN_PIN, LOW);
+      digitalWrite(BLUE_PIN, HIGH);
       break;
     case 3: // mode art
-      analogWrite(RED_PIN, 0);
-      analogWrite(GREEN_PIN, 0);
-      analogWrite(BLUE_PIN, 255);
+      digitalWrite(RED_PIN, HIGH);
+      digitalWrite(GREEN_PIN, HIGH);
+      digitalWrite(BLUE_PIN, LOW);
       break;
     case 4: // mode bomb
-      analogWrite(RED_PIN, 255);
-      analogWrite(GREEN_PIN, 255);
-      analogWrite(BLUE_PIN, 0);
-      break;
-    case 5: //PINK
-      analogWrite(RED_PIN, 0);
-      analogWrite(GREEN_PIN, 255);
-      analogWrite(BLUE_PIN, 0);
-      break;
-    case 6: //SKY BLUE
-      analogWrite(RED_PIN, 255);
-      analogWrite(GREEN_PIN, 0);
-      analogWrite(BLUE_PIN, 0);
-      break;
-    case 7: //WHITE
-      analogWrite(RED_PIN, 0);
-      analogWrite(GREEN_PIN, 0);
-      analogWrite(BLUE_PIN, 0);
+      digitalWrite(RED_PIN, LOW);
+      digitalWrite(GREEN_PIN, LOW);
+      digitalWrite(BLUE_PIN, HIGH);
       break;
   }
 }
@@ -129,6 +108,11 @@ int change_rgb(int current_H, int conversion_H){   // delay制御するかどう
   int R, G, B;
   int while_finish_val = current_H+conversion_H;
   while(current_H < while_finish_val){
+
+    if( digitalRead(ENCODER_SWITCH_PIN) ){
+      break;
+    }
+
     if(current_H <= H_LAP/3) {
       R = map(current_H, 0, H_LAP/3, 255, 0);
       G = map(current_H, 0, H_LAP/3, 0, 255);
@@ -172,6 +156,11 @@ void score_led(int total_score) {
 void return_loop_sugoroku(int total_score) {
   while(1){
     delay(50);
+
+    if( digitalRead(ENCODER_SWITCH_PIN) ){
+      break;
+    }
+
     acceleration_read();
     if(x<LOW_ACCELERATION || HIGH_ACCELERATION<x || y<LOW_ACCELERATION || HIGH_ACCELERATION<y){
       score_led(total_score);
@@ -198,6 +187,11 @@ int return_loop_bomb(int current_score) {
   int max_score = 30;
   while(1){
     delay(50);
+
+    if( digitalRead(ENCODER_SWITCH_PIN) ){
+      break;
+    }
+
     acceleration_read();
     if(x<LOW_ACCELERATION || HIGH_ACCELERATION<x || y<LOW_ACCELERATION || HIGH_ACCELERATION<y){
       warning_change_color(current_score);

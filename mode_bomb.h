@@ -38,8 +38,8 @@ Serial.println("bomb mode start");
       }
     }
 
-    int encoder_switch_val = analogRead(ENCODER_CLOCKWISE_PIN);
-    if(encoder_switch_val >= 1020){
+    if( digitalRead(ENCODER_SWITCH_PIN) ){
+Serial.println("bomb mode end");
       delay(MODE_CHANGE_DELAY);
       break;
     }
