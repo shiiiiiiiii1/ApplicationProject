@@ -1,8 +1,8 @@
 // for mode change   ---------------------------------------------------------------
 void rotation() {
-  int val_counterclockwise = digitalRead(encoder_counterclockwise_pin);
-  int val_clockwise = digitalRead(encoder_clockwise_pin);
-  int rotation_min = default_rotation;   // 1
+  int val_counterclockwise = digitalRead(ENCODER_COUNTERCLOCKWISE_PIN);
+  int val_clockwise = digitalRead(ENCODER_CLOCKWISE_PIN);
+  int rotation_min = DEFAULT_ROTATION;   // 1
   int rotation_max = 4;   // モード数
 
   if(val_counterclockwise == HIGH && val_clockwise == HIGH){   // 回してない時
@@ -31,56 +31,56 @@ void rotation() {
 void mode_color_change(int current_rotation) {
   switch(current_rotation){
     case 0:   // 色なしの色
-      analogWrite(cyan_pin, 255);
-      analogWrite(magenta_pin, 255);
-      analogWrite(yellow_pin, 255);
+      analogWrite(RED_PIN, 255);
+      analogWrite(GREEN_PIN, 255);
+      analogWrite(BLUE_PIN, 255);
       break;
     case 1: // mode normal
-      analogWrite(cyan_pin, 0);
-      analogWrite(magenta_pin, 255);
-      analogWrite(yellow_pin, 255);
+      analogWrite(RED_PIN, 0);
+      analogWrite(GREEN_PIN, 255);
+      analogWrite(BLUE_PIN, 255);
       break;
     case 2: // mode sugoroku
-      analogWrite(cyan_pin, 255);
-      analogWrite(magenta_pin, 0);
-      analogWrite(yellow_pin, 255);
+      analogWrite(RED_PIN, 255);
+      analogWrite(GREEN_PIN, 0);
+      analogWrite(BLUE_PIN, 255);
       break;
     case 3: // mode art
-      analogWrite(cyan_pin, 0);
-      analogWrite(magenta_pin, 0);
-      analogWrite(yellow_pin, 255);
+      analogWrite(RED_PIN, 0);
+      analogWrite(GREEN_PIN, 0);
+      analogWrite(BLUE_PIN, 255);
       break;
     case 4: // mode bomb
-      analogWrite(cyan_pin, 255);
-      analogWrite(magenta_pin, 255);
-      analogWrite(yellow_pin, 0);
+      analogWrite(RED_PIN, 255);
+      analogWrite(GREEN_PIN, 255);
+      analogWrite(BLUE_PIN, 0);
       break;
     case 5: //PINK
-      analogWrite(cyan_pin, 0);
-      analogWrite(magenta_pin, 255);
-      analogWrite(yellow_pin, 0);
+      analogWrite(RED_PIN, 0);
+      analogWrite(GREEN_PIN, 255);
+      analogWrite(BLUE_PIN, 0);
       break;
     case 6: //SKY BLUE
-      analogWrite(cyan_pin, 255);
-      analogWrite(magenta_pin, 0);
-      analogWrite(yellow_pin, 0);
+      analogWrite(RED_PIN, 255);
+      analogWrite(GREEN_PIN, 0);
+      analogWrite(BLUE_PIN, 0);
       break;
     case 7: //WHITE
-      analogWrite(cyan_pin, 0);
-      analogWrite(magenta_pin, 0);
-      analogWrite(yellow_pin, 0);
+      analogWrite(RED_PIN, 0);
+      analogWrite(GREEN_PIN, 0);
+      analogWrite(BLUE_PIN, 0);
       break;
   }
 }
 
 // for all mode   ---------------------------------------------------------------
 int acceleration_decision() {
-  int z_old_val = analogRead(acceleration_z_analogpin);
+  int z_old_val = analogRead(ACCELERATION_Z_ANALOGPIN);
   int z_difference = 0;
   int z_sum = 0;
   for(int i=0; i<2; i++){
     delay(50);
-    z = analogRead(acceleration_z_analogpin);
+    z = analogRead(ACCELERATION_Z_ANALOGPIN);
     z_difference = abs(z_old_val - z);
     z_sum += z_difference;
     z_old_val = z;
@@ -88,9 +88,9 @@ int acceleration_decision() {
   return z_sum;
 }
 void acceleration_read() {
-  x = analogRead(acceleration_x_analogpin);
-  y = analogRead(acceleration_y_analogpin);
-  z = analogRead(acceleration_z_analogpin);
+  x = analogRead(ACCELERATION_X_ANALOGPIN);
+  y = analogRead(ACCELERATION_Y_ANALOGPIN);
+  z = analogRead(ACCELERATION_Z_ANALOGPIN);
   x = x<10 ? 0 : x;
   x = x>1013 ? 1023 : x;
   y = y<10 ? 0 : y;
@@ -99,16 +99,16 @@ void acceleration_read() {
   z = z>1013 ? 1023 : z;
 }
 void change_ledcolor(int r, int g, int b) {
-  for(int i=0; i<num_leds; i++){
+  for(int i=0; i<NUM_LEDS; i++){
     rgbled.setPixelColor(i, rgbled.Color(r, g, b));
     rgbled.show();
   }
 }
 void flashing() {
   delay(1000);
-  digitalWrite(flash_pin, HIGH);
+  digitalWrite(FLASH_PIN, HIGH);
   delay(1000);
-  digitalWrite(flash_pin, LOW);
+  digitalWrite(FLASH_PIN, LOW);
 }
 
 // for normal mode   ---------------------------------------------------------------
@@ -116,7 +116,7 @@ void return_loop_normal() {
   while(1){
     delay(50);
     acceleration_read();
-    if(x<low_acceleration || high_acceleration<x || y<low_acceleration || high_acceleration<y){
+    if(x<LOW_ACCELERATION || HIGH_ACCELERATION<x || y<LOW_ACCELERATION || HIGH_ACCELERATION<y){
       change_ledcolor(255, 255, 255);
       delay(200);
       break;
@@ -129,19 +129,19 @@ int change_rgb(int current_H, int conversion_H){   // delay制御するかどう
   int R, G, B;
   int while_finish_val = current_H+conversion_H;
   while(current_H < while_finish_val){
-    if(current_H <= H_lap/3) {
-      R = map(current_H, 0, H_lap/3, 255, 0);
-      G = map(current_H, 0, H_lap/3, 0, 255);
+    if(current_H <= H_LAP/3) {
+      R = map(current_H, 0, H_LAP/3, 255, 0);
+      G = map(current_H, 0, H_LAP/3, 0, 255);
       B = 0;
     }
-    if(H_lap/3 < current_H && current_H <= H_lap*2/3){
-      G = map(current_H, H_lap/3, H_lap*2/3, 255, 0);
-      B = map(current_H, H_lap/3, H_lap*2/3, 0, 255);
+    if(H_LAP/3 < current_H && current_H <= H_LAP*2/3){
+      G = map(current_H, H_LAP/3, H_LAP*2/3, 255, 0);
+      B = map(current_H, H_LAP/3, H_LAP*2/3, 0, 255);
       R = 0;
     }
-    if(H_lap*2/3 < current_H){
-      B = map(current_H, H_lap*2/3, H_lap, 255, 0);
-      R = map(current_H, H_lap*2/3, H_lap, 0, 255);
+    if(H_LAP*2/3 < current_H){
+      B = map(current_H, H_LAP*2/3, H_LAP, 255, 0);
+      R = map(current_H, H_LAP*2/3, H_LAP, 0, 255);
       G= 0;
     }
     change_ledcolor(R, G, B);
@@ -154,18 +154,18 @@ int change_rgb(int current_H, int conversion_H){   // delay制御するかどう
 // for sugoroku mode   ---------------------------------------------------------------
 void score_led(int total_score) {
   delay(500);
-  total_score = total_score<=num_leds ? total_score : total_score-num_leds;
-  if(total_score < num_leds){
+  total_score = total_score<=NUM_LEDS ? total_score : total_score-NUM_LEDS;
+  if(total_score < NUM_LEDS){
     for(int i=0; i<total_score; i++){
       rgbled.setPixelColor(i, rgbled.Color(255, 255, 255));
       rgbled.show();
     }
-    for(int i=total_score; i<num_leds; i++){
+    for(int i=total_score; i<NUM_LEDS; i++){
       rgbled.setPixelColor(i, rgbled.Color(0, 0, 0));
       rgbled.show();
     }
   }
-  if(total_score == num_leds){
+  if(total_score == NUM_LEDS){
     flashing();
   }
 }
@@ -173,7 +173,7 @@ void return_loop_sugoroku(int total_score) {
   while(1){
     delay(50);
     acceleration_read();
-    if(x<low_acceleration || high_acceleration<x || y<low_acceleration || high_acceleration<y){
+    if(x<LOW_ACCELERATION || HIGH_ACCELERATION<x || y<LOW_ACCELERATION || HIGH_ACCELERATION<y){
       score_led(total_score);
       delay(200);
       break;
@@ -199,7 +199,7 @@ int return_loop_bomb(int current_score) {
   while(1){
     delay(50);
     acceleration_read();
-    if(x<low_acceleration || high_acceleration<x || y<low_acceleration || high_acceleration<y){
+    if(x<LOW_ACCELERATION || HIGH_ACCELERATION<x || y<LOW_ACCELERATION || HIGH_ACCELERATION<y){
       warning_change_color(current_score);
       if(current_score >= max_score){
         flashing();
